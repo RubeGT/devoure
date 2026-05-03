@@ -16,7 +16,7 @@
         /* --- THE SLIDING DRAWER --- */
         #question-drawer {
             position: fixed;
-            left: -280px; /* Hidden off-screen */
+            left: -280px; 
             top: 50%;
             transform: translateY(-50%);
             width: 250px;
@@ -33,7 +33,6 @@
             left: 20px;
         }
 
-        /* DRAWER TAB (The Arrow) */
         #drawer-tab {
             position: absolute;
             right: -40px;
@@ -48,6 +47,7 @@
             justify-content: center;
             cursor: pointer;
             font-weight: bold;
+            font-size: 18px;
         }
 
         .drawer-content {
@@ -64,6 +64,7 @@
             font-size: 11px;
             cursor: pointer;
             text-transform: uppercase;
+            color: #000;
         }
 
         .q-item:hover {
@@ -97,18 +98,6 @@
 
         #slide-trigger.visible { opacity: 1; pointer-events: auto; }
 
-        /* FPV & OVERLAYS */
-        #slide-fpv-screen {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: #000; display: none; z-index: 5000;
-        }
-
-        #fpv-image {
-            position: absolute; bottom: 0; left: 50%;
-            transform: translateX(-50%); height: 100%;
-        }
-
         .window {
             background: #c0c0c0; border: 2px solid;
             border-color: #fff #808080 #808080 #fff;
@@ -122,13 +111,24 @@
             background: black; opacity: 0; z-index: 9999;
             pointer-events: none; transition: opacity 1.3s ease-in;
         }
+
+        /* FPV */
+        #slide-fpv-screen {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: #000; display: none; z-index: 5000;
+        }
+
+        #fpv-image {
+            position: absolute; bottom: 0; left: 50%;
+            transform: translateX(-50%); height: 100%;
+        }
     </style>
 </head>
 <body>
 
     <div id="final-fade"></div>
 
-    <!-- SIDE PANEL DRAWER -->
     <div id="question-drawer">
         <div id="drawer-tab" onclick="toggleDrawer()"> > </div>
         <div class="title-bar">LOG_ENTRIES.EXE</div>
@@ -139,7 +139,7 @@
             <div class="q-item" onclick="talk('WHAT IS THE VESSEL?', 'vessel')">What is the Vessel?</div>
             <div class="q-item" onclick="talk('ARE YOU REAL?', 'real')">Are you real?</div>
             <div class="q-item" onclick="talk('IS THERE ANYONE ELSE?', 'anyoneelse')">Is there anyone else?</div>
-            <div class="q-item" onclick="talk('FUCK YOU.', 'fuckyou')">Fuck you.</div>
+            <div class="q-item" style="color: #800000;" onclick="talk('FUCK YOU.', 'fuckyou')">Fuck you.</div>
         </div>
     </div>
 
@@ -148,15 +148,14 @@
         <img src="slide.png" id="slide-trigger" onclick="enterSlidePOV()">
     </div>
 
-    <!-- FPV SCREEN -->
     <div id="slide-fpv-screen">
         <img src="slidefpx.png" id="fpv-image"> 
         <div id="slide-question-box" class="window" style="position:absolute; left:50%; top:50%; transform:translate(-50%,-50%);">
             <div class="title-bar">S Y S T E M</div>
-            <div style="padding:20px; text-align:center;">
+            <div style="padding:20px; text-align:center; font-size: 12px; font-weight: bold;">
                 READY &nbsp; TO &nbsp; SLIDE?
                 <br><br>
-                <button onclick="startSliding()" style="padding:5px 20px; font-weight:bold;">S L I D E</button>
+                <button onclick="startSliding()" style="padding:5px 20px; font-weight:bold; cursor: pointer; background: #c0c0c0; border: 2px solid; border-color: #fff #808080 #808080 #fff;">S L I D E</button>
             </div>
         </div>
     </div>
@@ -174,6 +173,8 @@
 
         function talk(userText, loreKey) {
             let response = "";
+            let shouldBoot = false;
+
             switch(loreKey) {
                 case 'whoareyou': response = "I AM THE ONE WHO STAYED BEHIND."; break;
                 case 'wherearewe': response = "A HAPPY PLACE. A PERFECT PLACE. A DIGITAL GRAVE."; break;
@@ -181,27 +182,34 @@
                 case 'vessel': response = "THE VESSEL IS THE SKIN. I AM THE PULSE."; break;
                 case 'real': response = "AS REAL AS THE DATA IN YOUR HEAD."; break;
                 case 'anyoneelse': response = "THEY ARE ALL PART OF THE CODE NOW."; break;
-                case 'fuckyou': response = "CRUDE. BUT UNDERSTANDABLE."; break;
+                case 'fuckyou': 
+                    response = "UNAUTHORIZED LANGUAGE. TERMINATING SESSION."; 
+                    shouldBoot = true;
+                    break;
                 case 'intro': response = "WELCOME TO YOUR HAPPY PLACE. I HAVE BEEN WAITING."; break;
             }
 
             const utter = new SpeechSynthesisUtterance(response);
-            
-            // 1980s ROBOT SETTINGS
-            utter.pitch = 1.8; // High pitch
-            utter.rate = 0.9;  // Slightly slow
+            utter.pitch = 1.8;
+            utter.rate = 0.9;
             
             utter.onstart = () => { sprite.src = "talking.gif?t=" + Date.now(); };
-            utter.onend = () => { sprite.src = "idle.gif"; };
+            
+            utter.onend = () => { 
+                sprite.src = "idle.gif"; 
+                if(shouldBoot) {
+                    window.location.href = "https://www.google.com/search?q=where+do+i+live";
+                }
+            };
 
             synth.speak(utter);
         }
 
         window.onload = () => {
+            // Initial interaction required for TTS in most browsers
             setTimeout(() => {
                 talk('', 'intro');
                 slideBtn.classList.add('visible');
-                // Auto-open drawer after intro
                 setTimeout(toggleDrawer, 2000);
             }, 1000);
         };
