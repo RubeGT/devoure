@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>merch</title>
+    <title>happy place :)</title>
     <style>
         body {
             background: #008080; 
@@ -26,7 +26,6 @@
             align-items: center;
         }
 
-        /* STAGE: Keeps Vessel and Slide Button centered in the middle */
         #stage {
             display: flex;
             align-items: center;
@@ -41,7 +40,6 @@
             image-rendering: pixelated; 
         }
 
-        /* SLIDE BUTTON - Fixed to the right of the Vessel */
         #slide-trigger {
             margin-left: 30px; 
             width: 180px;
@@ -60,7 +58,6 @@
             transform: scale(1.1);
         }
 
-        /* BOX ROW: Centered questions at the bottom */
         #box-row {
             width: 100%;
             display: flex;
@@ -136,11 +133,23 @@
             left: 5%; top: 45%;
             z-index: 6000; 
         }
+
+        /* FINAL FADE OUT OVERLAY */
+        #final-fade {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: black;
+            opacity: 0;
+            z-index: 9999;
+            pointer-events: none;
+            transition: opacity 1.3s ease-in; /* Matches the gif duration */
+        }
     </style>
 </head>
 <body>
 
     <audio id="vessel-audio"></audio>
+    <div id="final-fade"></div>
 
     <div id="main-ui">
         <div id="stage">
@@ -156,7 +165,6 @@
         </div>
     </div>
 
-    <!-- FPV SCREEN -->
     <div id="slide-fpv-screen">
         <img src="slidefpx.png" id="fpv-image"> 
         <div id="slide-question-box" class="window" style="display: block;">
@@ -174,6 +182,7 @@
         const sprite = document.getElementById('vessel-sprite');
         const audio = document.getElementById('vessel-audio');
         const slideBtn = document.getElementById('slide-trigger');
+        const finalFade = document.getElementById('final-fade');
 
         function playScene(sceneName) {
             let gif = "talking.gif";
@@ -213,7 +222,10 @@
             document.getElementById('slide-question-box').style.display = 'none';
             document.getElementById('fpv-image').src = "slidedown.gif?t=" + new Date().getTime();
             
-            // Matches your 1.30 second GIF length
+            // Start the screen fade to black
+            finalFade.style.opacity = "1";
+            
+            // Redirect after 1.30s animation
             setTimeout(() => {
                 window.location.href = "https://terus.freegorillatagdownload.com";
             }, 1300);
