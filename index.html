@@ -2,22 +2,22 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>The Vessel - Interactive</title>
+    <title>devoure</title>
     <style>
         body {
-            background: #008080; /* Classic Retro Teal */
+            background: #008080; 
             margin: 0;
             padding: 0;
             width: 100vw;
             height: 100vh;
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
             overflow: hidden;
             font-family: "Tahoma", sans-serif;
         }
 
-        /* GIF CONTAINER - Covers the whole screen but keeps sprite size */
         #vessel-container {
             position: absolute;
             top: 0;
@@ -28,27 +28,33 @@
             justify-content: center;
             align-items: center;
             z-index: 1;
-            pointer-events: none; /* Allows you to click boxes through the character */
+            pointer-events: none;
         }
 
         #vessel-sprite {
-            /* Adjust size here if he needs to be bigger or smaller */
             width: 500px; 
             height: auto;
             image-rendering: pixelated; 
         }
 
-        /* Windows 95 Styled Boxes */
-        .window {
+        #box-row {
             position: absolute;
-            width: 350px;
+            bottom: 30px;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            z-index: 100;
+        }
+
+        .window {
+            width: 280px;
             background: #c0c0c0;
             border: 2px solid;
             border-color: #fff #808080 #808080 #fff;
             padding: 2px;
             display: none; 
-            box-shadow: 4px 4px 0px rgba(0,0,0,1);
-            z-index: 100;
+            box-shadow: 3px 3px 0px rgba(0,0,0,1);
         }
 
         .title-bar {
@@ -56,33 +62,33 @@
             color: white;
             padding: 3px 5px;
             font-weight: bold;
-            font-size: 12px;
+            font-size: 11px;
         }
 
         .window-body {
-            padding: 25px;
+            padding: 20px;
             text-align: center;
-            font-size: 16px;
+            font-size: 14px;
             color: black;
             font-weight: bold;
             
-            /* CREEPY SPACING LOGIC */
-            word-spacing: 12px;  /* Huge gaps between words */
-            letter-spacing: 2px; /* Gaps between letters */
+            /* UPDATED SPACING */
+            word-spacing: 12px;   /* Wide gaps between words */
+            letter-spacing: normal; /* Normal letter spacing as requested */
+            line-height: 1.4;
             text-transform: uppercase;
         }
 
         .btn-row {
-            margin-top: 20px;
+            margin-top: 15px;
             display: flex;
             justify-content: center;
-            gap: 20px;
-            word-spacing: normal; /* Buttons keep normal spacing */
-            letter-spacing: normal;
+            gap: 10px;
+            word-spacing: normal; 
         }
 
         button {
-            padding: 5px 25px;
+            padding: 4px 12px;
             background: #c0c0c0;
             border: 2px solid;
             border-color: #fff #808080 #808080 #fff;
@@ -104,25 +110,37 @@
         <img src="idle.gif" id="vessel-sprite">
     </div>
 
-    <!-- BOX 1 -->
-    <div id="box-1" class="window" style="top: 20%; left: 10%;">
-        <div class="title-bar">M E S S A G E</div>
-        <div class="window-body">
-            D O &nbsp; Y O U &nbsp; R E C O G N I Z E &nbsp; M E ?
-            <div class="btn-row">
-                <button onclick="answer(1, true)">Y E S</button>
-                <button onclick="answer(1, false)">N O</button>
+    <div id="box-row">
+        <div id="box-1" class="window">
+            <div class="title-bar">MESSAGE_01</div>
+            <div class="window-body">
+                DO YOU FEEL SAFE?
+                <div class="btn-row">
+                    <button onclick="answer(1, true)">YES</button>
+                    <button onclick="answer(1, false)">NO</button>
+                </div>
             </div>
         </div>
-    </div>
 
-    <!-- BOX 2 (Hidden until Box 1 is answered) -->
-    <div id="box-2" class="window" style="bottom: 20%; right: 10%;">
-        <div class="title-bar">M E S S A G E</div>
-        <div class="window-body">
-            W H Y &nbsp; A R E &nbsp; Y O U &nbsp; S T I L L &nbsp; H E R E ?
-            <div class="btn-row">
-                <button onclick="answer(2, true)">I &nbsp; D O N T &nbsp; K N O W</button>
+        <div id="box-2" class="window">
+            <div class="title-bar">MESSAGE_02</div>
+            <div class="window-body">
+                WHO ARE YOU?
+                <div class="btn-row">
+                    <button onclick="answer(2, 'human')">HUMAN</button>
+                    <button onclick="answer(2, 'other')">VESSEL</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="box-3" class="window">
+            <div class="title-bar">MESSAGE_03</div>
+            <div class="window-body">
+                ARE WE FRIENDS?
+                <div class="btn-row">
+                    <button onclick="answer(3, true)">YES</button>
+                    <button onclick="answer(3, false)">...</button>
+                </div>
             </div>
         </div>
     </div>
@@ -142,7 +160,7 @@
                 case 'happyplace': mp3 = "happyplacestart.mp3"; break;
                 case 'fuckyou': 
                     mp3 = "fuckyou.mp3"; 
-                    gif = "idle.gif"; // Stare state
+                    gif = "idle.gif"; 
                     break;
             }
 
@@ -160,25 +178,22 @@
                 playScene('wherearewe');
                 audio.onended = () => {
                     sprite.src = "idle.gif";
-                    document.getElementById('box-1').style.display = 'block';
+                    showBoxes();
                 };
             }, 2000);
         };
 
-        function answer(boxNum, isYes) {
+        function showBoxes() {
+            ['box-1', 'box-2', 'box-3'].forEach((id, i) => {
+                setTimeout(() => document.getElementById(id).style.display = 'block', i * 400);
+            });
+        }
+
+        function answer(boxNum, choice) {
             document.getElementById('box-' + boxNum).style.display = 'none';
-            
-            if (boxNum === 1) {
-                if (isYes) {
-                    playScene('happyplace');
-                } else {
-                    playScene('fuckyou');
-                }
-                // Show next box after a delay
-                setTimeout(() => {
-                    document.getElementById('box-2').style.display = 'block';
-                }, 2000);
-            }
+            if (boxNum === 3 && choice === false) playScene('fuckyou');
+            else if (boxNum === 1 && choice === true) playScene('happyplace');
+            else playScene('howdidwegethere');
         }
     </script>
 </body>
