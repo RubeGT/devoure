@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>devoure</title>
+    <title>The Vessel - Interactive</title>
     <style>
         body {
             background: #008080; 
@@ -71,10 +71,7 @@
             font-size: 14px;
             color: black;
             font-weight: bold;
-            
-            /* UPDATED SPACING */
-            word-spacing: 12px;   /* Wide gaps between words */
-            letter-spacing: normal; /* Normal letter spacing as requested */
+            word-spacing: 12px;
             line-height: 1.4;
             text-transform: uppercase;
         }
@@ -83,7 +80,6 @@
             margin-top: 15px;
             display: flex;
             justify-content: center;
-            gap: 10px;
             word-spacing: normal; 
         }
 
@@ -111,35 +107,46 @@
     </div>
 
     <div id="box-row">
+        <!-- BOX 1: WHO ARE YOU -->
         <div id="box-1" class="window">
             <div class="title-bar">MESSAGE_01</div>
             <div class="window-body">
-                DO YOU FEEL SAFE?
+                WHO ARE YOU?
                 <div class="btn-row">
-                    <button onclick="answer(1, true)">YES</button>
-                    <button onclick="answer(1, false)">NO</button>
+                    <button onclick="playScene('whoareyou')">ASK</button>
                 </div>
             </div>
         </div>
 
+        <!-- BOX 2: WHERE ARE WE -->
         <div id="box-2" class="window">
             <div class="title-bar">MESSAGE_02</div>
             <div class="window-body">
-                WHO ARE YOU?
+                WHERE ARE WE?
                 <div class="btn-row">
-                    <button onclick="answer(2, 'human')">HUMAN</button>
-                    <button onclick="answer(2, 'other')">VESSEL</button>
+                    <button onclick="playScene('wherearewe')">ASK</button>
                 </div>
             </div>
         </div>
 
+        <!-- BOX 3: HOW DID I GET HERE -->
         <div id="box-3" class="window">
             <div class="title-bar">MESSAGE_03</div>
             <div class="window-body">
-                ARE WE FRIENDS?
+                HOW DID I GET HERE?
                 <div class="btn-row">
-                    <button onclick="answer(3, true)">YES</button>
-                    <button onclick="answer(3, false)">...</button>
+                    <button onclick="playScene('howdidwegethere')">ASK</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- BOX 4: FUCK YOU -->
+        <div id="box-4" class="window">
+            <div class="title-bar">MESSAGE_04</div>
+            <div class="window-body">
+                FUCK YOU.
+                <div class="btn-row">
+                    <button onclick="playScene('fuckyou')">SAY IT</button>
                 </div>
             </div>
         </div>
@@ -154,13 +161,13 @@
             let mp3 = "";
 
             switch(sceneName) {
+                case 'happyplace': mp3 = "happyplacestart.mp3"; break;
                 case 'whoareyou': mp3 = "whoareyou.mp3"; break;
                 case 'wherearewe': mp3 = "wherearewe.mp3"; break;
                 case 'howdidwegethere': mp3 = "howdidwegethere.mp3"; break;
-                case 'happyplace': mp3 = "happyplacestart.mp3"; break;
                 case 'fuckyou': 
                     mp3 = "fuckyou.mp3"; 
-                    gif = "idle.gif"; 
+                    gif = "idle.gif"; // Stare state
                     break;
             }
 
@@ -173,27 +180,21 @@
             };
         }
 
+        // Logic: Play intro, then show boxes
         window.onload = () => {
             setTimeout(() => {
-                playScene('wherearewe');
+                playScene('happyplace');
                 audio.onended = () => {
                     sprite.src = "idle.gif";
                     showBoxes();
                 };
-            }, 2000);
+            }, 1000);
         };
 
         function showBoxes() {
-            ['box-1', 'box-2', 'box-3'].forEach((id, i) => {
-                setTimeout(() => document.getElementById(id).style.display = 'block', i * 400);
+            ['box-1', 'box-2', 'box-3', 'box-4'].forEach((id, i) => {
+                setTimeout(() => document.getElementById(id).style.display = 'block', i * 300);
             });
-        }
-
-        function answer(boxNum, choice) {
-            document.getElementById('box-' + boxNum).style.display = 'none';
-            if (boxNum === 3 && choice === false) playScene('fuckyou');
-            else if (boxNum === 1 && choice === true) playScene('happyplace');
-            else playScene('howdidwegethere');
         }
     </script>
 </body>
