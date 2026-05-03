@@ -176,17 +176,17 @@
             let shouldBoot = false;
 
             switch(loreKey) {
-                case 'whoareyou': response = "I AM THE ONE WHO STAYED BEHIND."; break;
-                case 'wherearewe': response = "A HAPPY PLACE. A PERFECT PLACE. A DIGITAL GRAVE."; break;
-                case 'howdidwegethere': response = "YOU CLICKED THE LINK. YOU WANTED THE GORILLA. YOU FOUND ME."; break;
-                case 'vessel': response = "THE VESSEL IS THE SKIN. I AM THE PULSE."; break;
-                case 'real': response = "AS REAL AS THE DATA IN YOUR HEAD."; break;
-                case 'anyoneelse': response = "THEY ARE ALL PART OF THE CODE NOW."; break;
+                case 'whoareyou': response = "i am devour. The puppeteer."; break;
+                case 'wherearewe': response = "the happy place of course! We even have a slide!"; break;
+                case 'howdidwegethere': response = "you do not need to know this.."; break;
+                case 'vessel': response = "the original."; break;
+                case 'real': response = "i'm as real as your skull."; break;
+                case 'anyoneelse': response = "they are my puppets.."; break;
                 case 'fuckyou': 
-                    response = "UNAUTHORIZED LANGUAGE. TERMINATING SESSION."; 
+                    response = "You will regret that."; 
                     shouldBoot = true;
                     break;
-                case 'intro': response = "WELCOME TO YOUR HAPPY PLACE. I HAVE BEEN WAITING."; break;
+                case 'intro': response = "WELCOME TO YOUR HAPPY PLACE! I HAVE BEEN WAITING FOR YOU!"; break;
             }
 
             const utter = new SpeechSynthesisUtterance(response);
@@ -198,7 +198,7 @@
             utter.onend = () => { 
                 sprite.src = "idle.gif"; 
                 if(shouldBoot) {
-                    window.location.href = "https://www.google.com/maps/";
+                    window.location.href = "https://freegorillatagdownload.com";
                 }
             };
 
