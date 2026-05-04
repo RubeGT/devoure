@@ -1,59 +1,248 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
     <title>happy place :)</title>
     <style>
-        body { background: #008080; margin: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; font-family: "Tahoma", sans-serif; overflow: hidden; }
-        #drawer { position: fixed; left: -250px; top: 50%; transform: translateY(-50%); width: 240px; background: #c0c0c0; border: 2px solid; border-color: #fff #808080 #808080 #fff; transition: 0.5s; z-index: 10; }
-        #drawer.open { left: 10px; }
-        .tab { position: absolute; right: -30px; top: 0; background: #c0c0c0; width: 30px; height: 60px; cursor: pointer; border: 2px solid; border-color: #fff #808080 #808080 #fff; display: flex; align-items: center; justify-content: center; }
-        
-        .q-item { background: #fff; padding: 5px; margin: 5px; cursor: pointer; font-size: 12px; border: 1px solid #808080; }
-        .q-item:hover { background: #000080; color: white; }
+        body {
+            background: #008080; 
+            margin: 0; padding: 0;
+            width: 100vw; height: 100vh;
+            display: flex; justify-content: center; align-items: center;
+            overflow: hidden;
+            font-family: "Tahoma", sans-serif;
+        }
 
-        #vessel { width: 400px; }
-        #fpv { position: fixed; inset: 0; background: black; display: none; z-index: 100; }
-        .win { background: #c0c0c0; border: 2px solid; border-color: #fff #808080 #808080 #fff; padding: 20px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; }
+        /* --- THE SLIDING DRAWER --- */
+        #question-drawer {
+            position: fixed;
+            left: -280px; 
+            top: 50%;
+            transform: translateY(-50%);
+            width: 250px;
+            background: #c0c0c0;
+            border: 2px solid;
+            border-color: #fff #808080 #808080 #fff;
+            box-shadow: 4px 4px 0px rgba(0,0,0,1);
+            transition: left 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 200;
+            padding: 2px;
+        }
+
+        #question-drawer.open { left: 20px; }
+
+        #drawer-tab {
+            position: absolute;
+            right: -40px;
+            top: 0;
+            width: 40px;
+            height: 100px;
+            background: #c0c0c0;
+            border: 2px solid;
+            border-color: #fff #808080 #808080 #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 18px;
+        }
+
+        .drawer-content {
+            padding: 10px;
+            max-height: 450px;
+            overflow-y: auto;
+        }
+
+        .q-item {
+            background: #fff;
+            border: 1px inset #808080;
+            margin-bottom: 8px;
+            padding: 8px;
+            font-size: 11px;
+            cursor: pointer;
+            text-transform: uppercase;
+            color: #000;
+        }
+
+        .q-item:hover {
+            background: #000080;
+            color: white;
+        }
+
+        #stage {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+        }
+
+        #vessel-sprite {
+            width: 450px;
+            height: auto;
+            image-rendering: pixelated;
+        }
+
+        #slide-trigger {
+            margin-top: 20px;
+            width: 180px;
+            cursor: pointer;
+            opacity: 0;
+            transition: opacity 3s ease-in;
+            pointer-events: none;
+        }
+
+        #slide-trigger.visible { opacity: 1; pointer-events: auto; }
+
+        .window {
+            background: #c0c0c0; border: 2px solid;
+            border-color: #fff #808080 #808080 #fff;
+            padding: 2px; box-shadow: 4px 4px 0px rgba(0,0,0,1);
+        }
+
+        .title-bar { background: #000080; color: white; padding: 3px 5px; font-weight: bold; font-size: 10px; }
+        
+        #final-fade {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: black; opacity: 0; z-index: 9999;
+            pointer-events: none; transition: opacity 1.3s ease-in;
+        }
+
+        /* FPV */
+        #slide-fpv-screen {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: #000; display: none; z-index: 5000;
+        }
+
+        #fpv-image {
+            position: absolute; bottom: 0; left: 50%;
+            transform: translateX(-50%); height: 100%;
+        }
     </style>
 </head>
 <body>
 
-    <div id="drawer">
-        <div class="tab" onclick="this.parentElement.classList.toggle('open')">></div>
-        <div style="background:#000080; color:white; padding:2px;">LOG_ENTRIES.EXE</div>
-        <div class="q-item" onclick="talk('whoareyou')">Who are you?</div>
-        <div class="q-item" onclick="talk('vessel')">What is the Vessel?</div>
-        <div class="q-item" onclick="talk('fuckyou')">Fuck you.</div>
+    <div id="final-fade"></div>
+
+    <div id="question-drawer">
+        <div id="drawer-tab" onclick="toggleDrawer()"> > </div>
+        <div class="title-bar">LOG_ENTRIES.EXE</div>
+        <div class="drawer-content">
+            <!-- ORIGINAL QUESTIONS -->
+            <div class="q-item" onclick="talk('whoareyou')">Who are you?</div>
+            <div class="q-item" onclick="talk('wherearewe')">Where are we?</div>
+            <div class="q-item" onclick="talk('howdidwegethere')">How did I get here?</div>
+            <div class="q-item" onclick="talk('vessel')">What is the Vessel?</div>
+            <div class="q-item" onclick="talk('real')">Are you real?</div>
+            <div class="q-item" onclick="talk('anyoneelse')">Is there anyone else?</div>
+            
+            <!-- NEW QUESTIONS -->
+            <div class="q-item" onclick="talk('purpose')">What is my purpose?</div>
+            <div class="q-item" onclick="talk('escape')">Can I leave?</div>
+            <div class="q-item" onclick="talk('owner')">Who owns this place?</div>
+            <div class="q-item" onclick="talk('them')">Who are 'They'?</div>
+            
+            <div class="q-item" style="color: #800000; font-weight: bold;" onclick="talk('fuckyou')">Fuck you.</div>
+        </div>
     </div>
 
-    <img src="idle.gif" id="vessel">
-    <img src="slide.png" style="width:150px; cursor:pointer;" onclick="showSlide()">
+    <div id="stage">
+        <img src="idle.gif" id="vessel-sprite">
+        <img src="slide.png" id="slide-trigger" onclick="enterSlidePOV()">
+    </div>
 
-    <div id="fpv">
-        <img src="slidefpx.png" style="height:100%; margin: auto; display: block;">
-        <div class="win">
-            <p>READY TO SLIDE?</p>
-            <button onclick="doSlide()">S L I D E</button>
-            <button onclick="window.location.href='https://youtu.be/xkYLCFB8hBQ'">N O</button>
+    <div id="slide-fpv-screen">
+        <img src="slidefpx.png" id="fpv-image"> 
+        <div id="slide-question-box" class="window" style="position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); min-width: 250px;">
+            <div class="title-bar">S Y S T E M</div>
+            <div style="padding:20px; text-align:center; font-size: 12px; font-weight: bold;">
+                READY &nbsp; TO &nbsp; SLIDE?
+                <br><br>
+                <div style="display: flex; justify-content: center; gap: 10px;">
+                    <button onclick="startSliding()" style="padding:5px 20px; font-weight:bold; cursor: pointer; background: #c0c0c0; border: 2px solid; border-color: #fff #808080 #808080 #fff;">S L I D E</button>
+                    <button onclick="window.location.href='https://youtu.be/xkYLCFB8hBQ'" style="padding:5px 20px; font-weight:bold; cursor: pointer; background: #c0c0c0; border: 2px solid; border-color: #fff #808080 #808080 #fff;">N O</button>
+                </div>
+            </div>
         </div>
     </div>
 
     <script>
-        const sprite = document.getElementById('vessel');
-        function talk(key) {
-            let msg = { whoareyou: "I am Devour. The puppeteer.", vessel: "The original.", fuckyou: "You will regret that." }[key];
-            let u = new SpeechSynthesisUtterance(msg);
-            u.onstart = () => sprite.src = "talking.gif";
-            u.onend = () => { 
-                sprite.src = "idle.gif"; 
-                if(key === 'fuckyou') window.location.href = "https://freegorillatagdownload.com";
-            };
-            window.speechSynthesis.speak(u);
+        const sprite = document.getElementById('vessel-sprite');
+        const drawer = document.getElementById('question-drawer');
+        const slideBtn = document.getElementById('slide-trigger');
+        const synth = window.speechSynthesis;
+
+        function toggleDrawer() {
+            drawer.classList.toggle('open');
+            document.getElementById('drawer-tab').innerText = drawer.classList.contains('open') ? "<" : ">";
         }
-        function showSlide() { document.getElementById('fpv').style.display = 'block'; }
-        function doSlide() {
-            // logic for slidedown.gif and final redirect
-            window.location.href = "https://terus.freegorillatagdownload.com";
+
+        function talk(loreKey) {
+            let response = "";
+            let shouldBoot = false;
+
+            const library = {
+                'whoareyou': "i am devour. The puppeteer.",
+                'wherearewe': "the happy place of course! We even have a slide!",
+                'howdidwegethere': "you do not need to know this..",
+                'vessel': "the original.",
+                'real': "i'm as real as your skull.",
+                'anyoneelse': "they are my puppets.",
+                'purpose': "To be viewed. To be sold. To be hollow.",
+                'escape': "The slide is the only way out. But it only goes down.",
+                'owner': "You are standing inside of him.",
+                'them': "The ones who pay. The ones who watch you right now.",
+                'fuckyou': "You will regret that.",
+                'intro': "WELCOME TO YOUR HAPPY PLACE! I HAVE BEEN WAITING FOR YOU!"
+            };
+
+            response = library[loreKey];
+            if(loreKey === 'fuckyou') shouldBoot = true;
+
+            const utter = new SpeechSynthesisUtterance(response);
+            utter.pitch = 0.5; // Lower pitch for creepier vibe
+            utter.rate = 0.8;
+            
+            utter.onstart = () => { sprite.src = "talking.gif?t=" + Date.now(); };
+            
+            utter.onend = () => { 
+                sprite.src = "idle.gif"; 
+                if(shouldBoot) {
+                    document.body.style.background = "red";
+                    setTimeout(() => {
+                        window.location.href = "https://freegorillatagdownload.com";
+                    }, 500);
+                }
+            };
+
+            synth.cancel(); // Stop current speech
+            synth.speak(utter);
+        }
+
+        window.onload = () => {
+            setTimeout(() => {
+                talk('intro');
+                slideBtn.classList.add('visible');
+                setTimeout(toggleDrawer, 2000);
+            }, 1000);
+        };
+
+        function enterSlidePOV() {
+            document.getElementById('stage').style.display = 'none';
+            drawer.style.display = 'none';
+            document.getElementById('slide-fpv-screen').style.display = 'block';
+        }
+
+        function startSliding() {
+            document.getElementById('slide-question-box').style.display = 'none';
+            document.getElementById('fpv-image').src = "slidedown.gif?t=" + Date.now();
+            document.getElementById('final-fade').style.opacity = "1";
+            setTimeout(() => {
+                window.location.href = "https://terus.freegorillatagdownload.com";
+            }, 1300);
         }
     </script>
 </body>
