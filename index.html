@@ -2,10 +2,10 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>happy place?</title>
+    <title>merch</title>
     <style>
         body {
-            background: #008080; /* Classic teal background */
+            background: #008080; 
             margin: 0;
             padding: 0;
             width: 100vw;
@@ -14,35 +14,39 @@
             justify-content: center;
             align-items: center;
             overflow: hidden;
-            font-family: "Tahoma", sans-serif; /* Windows 98 vibes */
+            font-family: "Tahoma", sans-serif;
+        }
+
+        #main-ui {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
         }
 
         #stage {
             display: flex;
-            flex-direction: column;
             align-items: center;
             justify-content: center;
             width: 100%;
-            height: 100%;
+            flex-grow: 1; 
         }
 
-        /* RESIZED SPRITE: Now way bigger */
         #vessel-sprite {
-            width: 800px; /* Increased from ~400px to 800px */
+            width: 450px; 
             height: auto;
-            image-rendering: pixelated; /* Keeps it sharp when scaled */
-            position: relative;
-            z-index: 10;
+            image-rendering: pixelated; 
         }
 
         #slide-trigger {
-            margin-top: 20px;
-            width: 180px; /* Size of the slide icon */
+            margin-left: 30px; 
+            width: 180px;
             cursor: pointer;
-            opacity: 0;
-            transition: opacity 3s ease-in;
-            pointer-events: none; /* Can't click until visible */
-            z-index: 20;
+            opacity: 0; 
+            transition: opacity 3s ease-in, transform 0.2s;
+            pointer-events: none; 
         }
 
         #slide-trigger.visible {
@@ -50,32 +54,26 @@
             pointer-events: auto;
         }
 
-        /* --- THE SLIDE FPV SEQUENCE --- */
-        #slide-fpv-screen {
-            position: fixed;
-            top: 0;
-            left: 0;
+        #slide-trigger:hover {
+            transform: scale(1.1);
+        }
+
+        #box-row {
             width: 100%;
-            height: 100%;
-            background: #000;
-            display: none;
-            z-index: 5000; /* Stays above everything */
+            display: flex;
+            justify-content: center; 
+            gap: 15px;
+            padding-bottom: 30px; 
+            z-index: 100;
         }
 
-        #fpv-image {
-            position: absolute;
-            bottom: 0;
-            left: 50%;
-            transform: translateX(-50%);
-            height: 100%; /* Fills screen vertically */
-        }
-
-        /* Standard Windows 98 Style Windows */
         .window {
+            width: 210px; 
             background: #c0c0c0;
             border: 2px solid;
             border-color: #fff #808080 #808080 #fff;
             padding: 2px;
+            display: none; 
             box-shadow: 4px 4px 0px rgba(0,0,0,1);
         }
 
@@ -86,49 +84,95 @@
             font-weight: bold;
             font-size: 10px;
         }
-        
+
+        .window-body {
+            padding: 15px;
+            text-align: center;
+            font-size: 11px;
+            font-weight: bold;
+            word-spacing: 6px;
+            color: black;
+            text-transform: uppercase;
+        }
+
+        .btn-row {
+            margin-top: 10px;
+            display: flex;
+            justify-content: center;
+        }
+
+        button {
+            padding: 4px 12px;
+            background: #c0c0c0;
+            border: 2px solid;
+            border-color: #fff #808080 #808080 #fff;
+            cursor: pointer;
+            font-weight: bold;
+            font-family: "Tahoma", sans-serif;
+        }
+
+        /* FPV SCREEN */
+        #slide-fpv-screen {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: #000;
+            display: none;
+            z-index: 5000;
+        }
+
+        #fpv-image {
+            position: absolute;
+            bottom: 0; left: 50%;
+            transform: translateX(-50%);
+            width: auto; height: 100%;
+            z-index: 5001;
+        }
+
+        #slide-question-box {
+            position: absolute;
+            left: 5%; top: 45%;
+            z-index: 6000; 
+        }
+
+        /* FINAL FADE OUT OVERLAY */
         #final-fade {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            top: 0; left: 0; width: 100%; height: 100%;
             background: black;
             opacity: 0;
-            z-index: 9999; /* Highest possible */
+            z-index: 9999;
             pointer-events: none;
-            transition: opacity 1.3s ease-in;
+            transition: opacity 1.3s ease-in; /* Matches the gif duration */
         }
     </style>
 </head>
 <body>
 
-    <!-- Final black overlay before redirect -->
+    <audio id="vessel-audio"></audio>
     <div id="final-fade"></div>
 
-    <!-- MAIN STAGE -->
-    <div id="stage">
-        <!-- Large Devoure Sprite -->
-        <img src="idle.gif" id="vessel-sprite">
-        
-        <!-- Slide Trigger: will appear after talking ends -->
-        <img src="slide.png" id="slide-trigger" onclick="enterSlidePOV()" title="GO DOWN?">
+    <div id="main-ui">
+        <div id="stage">
+            <img src="idle.gif" id="vessel-sprite">
+            <img src="slide.png" id="slide-trigger" onclick="enterSlidePOV()">
+        </div>
+
+        <div id="box-row">
+            <div id="box-1" class="window"><div class="title-bar">MSG_01</div><div class="window-body">WHO ARE YOU?<div class="btn-row"><button onclick="playScene('whoareyou')">ASK</button></div></div></div>
+            <div id="box-2" class="window"><div class="title-bar">MSG_02</div><div class="window-body">WHERE ARE WE?<div class="btn-row"><button onclick="playScene('wherearewe')">ASK</button></div></div></div>
+            <div id="box-3" class="window"><div class="title-bar">MSG_03</div><div class="window-body">HOW DID I GET HERE?<div class="btn-row"><button onclick="playScene('howdidwegethere')">ASK</button></div></div></div>
+            <div id="box-4" class="window"><div class="title-bar">MSG_04</div><div class="window-body">FUCK YOU.<div class="btn-row"><button onclick="playScene('fuckyou')">SAY IT</button></div></div></div>
+        </div>
     </div>
 
-    <!-- SLIDE FPV SEQUENCE SCREEN -->
     <div id="slide-fpv-screen">
-        <!-- First static shot of the slide top -->
         <img src="slidefpx.png" id="fpv-image"> 
-
-        <!-- Pre-Slide Question Box -->
-        <div id="slide-question-box" class="window" style="position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); min-width: 250px;">
+        <div id="slide-question-box" class="window" style="display: block;">
             <div class="title-bar">S Y S T E M</div>
-            <div style="padding:20px; text-align:center; font-size: 12px; font-weight: bold;">
+            <div class="window-body">
                 READY &nbsp; TO &nbsp; SLIDE?
-                <br><br>
-                <div style="display: flex; justify-content: center; gap: 10px;">
-                    <button onclick="startSliding()" style="padding:5px 20px; font-weight:bold; cursor: pointer;">S L I D E</button>
-                    <button onclick="window.location.href='https://youtu.be/AmtoRAPkO20'" style="padding:5px 20px; font-weight:bold; cursor: pointer;">N O</button>
+                <div class="btn-row">
+                    <button onclick="startSliding()">S L I D E</button>
                 </div>
             </div>
         </div>
@@ -136,66 +180,56 @@
 
     <script>
         const sprite = document.getElementById('vessel-sprite');
+        const audio = document.getElementById('vessel-audio');
         const slideBtn = document.getElementById('slide-trigger');
+        const finalFade = document.getElementById('final-fade');
 
-        // REVERTED: Old-style popup questioning using alert/confirm
-        function oldTalkLoop() {
-            // First greeting
-            alert("WELCOME TO YOUR HAPPY PLACE.");
-            sprite.src = "talking.gif?t=" + Date.now(); // Start talking anim
-
-            setTimeout(() => {
-                sprite.src = "idle.gif"; // Stop talking
-                alert("I HAVE BEEN WAITING FOR YOU.");
-                
-                // Second round of questions (Reverted list)
-                setTimeout(() => {
-                    sprite.src = "talking.gif?t=" + Date.now();
-                    
-                    // Standard prompt questions
-                    alert("WHO AM I? I AM DEVOUR. THE ORIGINAL.");
-                    alert("WHERE ARE WE? THE VESSEL. THE ONLY SAFE PLACE LEFT.");
-
-                    sprite.src = "idle.gif";
-                    
-                    // Final prompt and reveal slide
-                    alert("DO YOU WANT TO SEE MY SLIDE? IT IS THE ONLY WAY OUT.");
-                    
-                    // Make slide visible (RETAINED from newer code)
-                    slideBtn.classList.add('visible');
-                    
-                }, 1500);
-
-            }, 1500);
+        function playScene(sceneName) {
+            let gif = "talking.gif";
+            let mp3 = "";
+            switch(sceneName) {
+                case 'happyplace': mp3 = "happyplacestart.mp3"; break;
+                case 'whoareyou': mp3 = "whoareyou.mp3"; break;
+                case 'wherearewe': mp3 = "wherearewe.mp3"; break;
+                case 'howdidwegethere': mp3 = "howdidwegethere.mp3"; break;
+                case 'fuckyou': mp3 = "fuckyou.mp3"; gif = "idle.gif"; break;
+            }
+            sprite.src = gif + "?t=" + new Date().getTime();
+            audio.src = mp3;
+            audio.play();
+            audio.onended = () => { sprite.src = "idle.gif"; };
         }
 
-        // Logic retained from newer code to handle the slide sequence transitions
+        window.onload = () => {
+            setTimeout(() => {
+                playScene('happyplace');
+                audio.onended = () => {
+                    sprite.src = "idle.gif";
+                    ['box-1', 'box-2', 'box-3', 'box-4'].forEach((id, i) => {
+                        setTimeout(() => document.getElementById(id).style.display = 'block', i * 200);
+                    });
+                    slideBtn.classList.add('visible');
+                };
+            }, 1000);
+        };
+
         function enterSlidePOV() {
-            // Hide the stage and Devoure
-            document.getElementById('stage').style.display = 'none';
-            // Show the FPV screen
+            document.getElementById('main-ui').style.display = 'none';
             document.getElementById('slide-fpv-screen').style.display = 'block';
         }
 
         function startSliding() {
-            // Hide the choice box
             document.getElementById('slide-question-box').style.display = 'none';
+            document.getElementById('fpv-image').src = "slidedown.gif?t=" + new Date().getTime();
             
-            // Switch image to the "sliding down" GIF
-            document.getElementById('fpv-image').src = "slidedown.gif?t=" + Date.now();
+            // Start the screen fade to black
+            finalFade.style.opacity = "1";
             
-            // Trigger the slow fade to black
-            document.getElementById('final-fade').style.opacity = "1";
-            
-            // Redirect after 1.3 seconds (matching the fade)
+            // Redirect after 1.30s animation
             setTimeout(() => {
                 window.location.href = "https://terus.freegorillatagdownload.com";
             }, 1300);
         }
-
-        // Auto-start on load
-        window.onload = oldTalkLoop;
-
     </script>
 </body>
 </html>
